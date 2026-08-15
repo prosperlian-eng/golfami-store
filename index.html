@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOLFAMI オンラインストア｜親子が動画で紹介しているゴルフ道具</title>
+<meta name="description" content="親孝行から始まった親子ゴルフチャンネルGOLFAMIのオンラインストア。動画の中で親子が紹介してきたゴルフ道具をまとめています。収益は次の夢企画の活動費になります。">
+<!-- OGP: og:imageは公式ロゴ（公開時にog:url追加。横長1200×630の親子写真が来たら差し替え推奨） -->
+<meta property="og:title" content="GOLFAMI オンラインストア">
+<meta property="og:description" content="親子が動画で紹介している物。収益は次の夢企画の活動費に。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://prosperlian-eng.github.io/golfami-store/assets/ogp.jpg">
+<link rel="icon" href="assets/logo-circle.jpg">
+<link rel="apple-touch-icon" href="assets/logo-circle.jpg">
+<script>document.documentElement.className+=' js';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700;800&family=Zen+Maru+Gothic:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF7F0;         /* 背景: クリーム */
+    --ink:#33291F;           /* 本文: 濃茶 */
+    --sub:#7A6E5F;           /* 補助テキスト（クリーム/白上で4.5:1確保） */
+    --brown:#3E2B20;         /* 焦げ茶（夢セクション・見出し） */
+    --brown-deep:#362419;    /* 焦げ茶・最暗部 */
+    --brown-ink:#F5E9DA;     /* 焦げ茶上のクリーム文字 */
+    --terra:#C0603A;         /* 主役: テラコッタ（巨大数字・装飾） */
+    --terra-deep:#A84E2B;    /* テラコッタ濃（CTA・リボン。白文字で4.5:1確保） */
+    --terra-text:#9C4620;    /* テラコッタ文字用（小さい文字で4.5:1確保） */
+    --sun:#E9B44C;           /* 山吹（チップ・マーカー） */
+    --line:#EADFD0;
+    --rakuten:#BF0000;
+    --amazon:#232F3E;
+    --serif:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+    --maru:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);color:var(--ink);background:var(--cream);
+    line-height:1.8;font-size:16px;overflow-wrap:break-word;overflow-x:hidden;
+  }
+  a{color:var(--terra-text)}
+  img{max-width:100%;display:block}
+  .wrap{max-width:680px;margin:0 auto;padding:0 20px}
+
+  /* 紙のざらつき（feTurbulenceノイズ）を全面に極薄で敷く */
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* PR表記（ステマ規制対応）
+     消費者庁の運用基準Q13が「文字のサイズや色なども踏まえ明瞭であること」を求めるため、
+     ファーストビュー内に、山吹地×焦げ茶の太字で他の情報に紛れない帯として置く。 */
+  .pr-note{
+    position:relative;z-index:5;
+    background:var(--sun);color:#2E1D12;
+    font-family:var(--maru);font-weight:700;
+    font-size:clamp(12px,3.5vw,14px);line-height:1.6;text-align:center;
+    padding:10px 12px;letter-spacing:.02em;
+    border-bottom:2px solid #C99327;
+  }
+  /* 各行を折り返さず、必ず2行で収める（画面幅に応じて文字サイズが縮む） */
+  .pr-note span{display:block;white-space:nowrap}
+  /* 商品ごとの関係性の明示（提供を受けた物か、自腹で買った物か） */
+  .rel-tag{
+    display:inline-block;font-family:var(--maru);font-weight:700;
+    font-size:11px;line-height:1;letter-spacing:.06em;white-space:nowrap;
+    padding:6px 11px;border-radius:999px;margin-left:6px;vertical-align:1px;
+  }
+  .rel-tag.pr{background:#F6E3C0;color:#7A4A12;border:1px solid #DFBE85}
+  .rel-tag.own{background:#E7EFE3;color:#3F5A33;border:1px solid #C4D6BB}
+  .item .rel-tag{margin:0 0 0 6px}
+
+  /* ============================================================
+     ヒーロー = 表紙。実写サムネを全面に敷き、朝焼けスクリム＋
+     発光する朝日＋二層の雲を重ねる。文字は白の特大明朝。
+     ============================================================ */
+  header.hero{
+    position:relative;overflow:hidden;color:#fff;
+    background:linear-gradient(180deg,#2E1D12 0%,#4A3626 100%);
+  }
+  /* チャンネルアート「親子で挑むゴルフ人生」を表紙の顔として最上部に完全な形で見せる */
+  .hero-art{position:relative;width:100%;aspect-ratio:16/9}
+  .hero-art img{width:100%;height:100%;object-fit:cover;display:block}
+  /* 写真の下端を焦げ茶に溶かして、下の文字ブロックへつなぐ */
+  .hero-art::after{
+    content:"";position:absolute;left:0;right:0;bottom:-1px;height:36%;
+    background:linear-gradient(180deg,transparent 0%,rgba(46,29,18,.94) 100%);
+  }
+  .hero-sky{position:absolute;inset:0;pointer-events:none}
+  /* 朝日: 写真の上にscreen合成で発光させる */
+  .sun{
+    position:absolute;left:-10%;top:0;
+    width:min(58vw,340px);aspect-ratio:1/1;border-radius:50%;
+    mix-blend-mode:screen;
+    background:radial-gradient(circle at 50% 50%,
+      rgba(255,224,160,.95) 0%,
+      rgba(255,186,110,.62) 34%,
+      rgba(255,170,90,.28) 55%,
+      rgba(255,170,90,0) 72%);
+    transform-origin:50% 60%;
+    animation:sunrise 10s ease-in-out infinite alternate;
+  }
+  @keyframes sunrise{
+    from{transform:scale(.94);opacity:.7}
+    to{transform:scale(1.06);opacity:1}
+  }
+  /* 雲は二層。速度差でパララックス */
+  .cloud{
+    position:absolute;border-radius:50%;mix-blend-mode:screen;
+    background:radial-gradient(closest-side,rgba(255,246,230,.85),rgba(255,246,230,0));
+  }
+  .cloud-a{top:10%;width:300px;height:64px;animation:drift 80s linear infinite;animation-delay:-28s}
+  .cloud-b{top:26%;width:190px;height:44px;opacity:.7;animation:drift 128s linear infinite;animation-delay:-70s}
+  @keyframes drift{
+    from{transform:translateX(-340px)}
+    to{transform:translateX(calc(100vw + 340px))}
+  }
+  .hero .wrap{position:relative;z-index:2;width:100%;padding-top:30px;padding-bottom:8px}
+  /* 雑誌のマストヘッド: 英字は特大セリフ */
+  .hero-logo{
+    width:76px;height:76px;border-radius:50%;object-fit:cover;
+    border:2px solid rgba(255,233,201,.55);box-shadow:0 4px 18px rgba(46,29,18,.45);
+    margin-bottom:14px;
+  }
+  .eyebrow{margin-bottom:14px}
+  .eyebrow .brand{
+    display:block;font-family:var(--serif);font-weight:800;
+    font-size:clamp(26px,7.4vw,34px);letter-spacing:.3em;line-height:1;
+    text-transform:uppercase;color:#FFE9C9;
+    text-shadow:0 2px 18px rgba(46,29,18,.5);
+  }
+  .eyebrow .brand-sub{
+    display:block;font-size:11px;letter-spacing:.3em;color:#F5D9AE;
+    margin-top:8px;font-weight:700;
+  }
+  .hero h1{
+    font-family:var(--serif);font-weight:800;
+    font-size:clamp(27px,7.3vw,44px);line-height:1.5;letter-spacing:.01em;
+    margin:10px 0 14px;text-wrap:balance;color:#fff;
+    text-shadow:0 2px 22px rgba(46,29,18,.55);
+  }
+  .hero p.lead{
+    font-size:16px;line-height:2;color:#FBEEDD;
+    text-shadow:0 1px 10px rgba(46,29,18,.6);
+  }
+  .hero p.lead strong{
+    color:#fff;font-weight:700;
+    background:linear-gradient(transparent 62%,rgba(233,180,76,.55) 62%,rgba(233,180,76,.55) 94%,transparent 94%);
+  }
+  /* 主役CTA: グラデ＋光沢スイープ */
+  .hero-cta{
+    position:relative;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    width:min(100%,330px);margin:22px 0 26px;min-height:56px;
+    background:linear-gradient(180deg,var(--terra) 0%,var(--terra-deep) 100%);
+    color:#fff;text-decoration:none;
+    font-family:var(--maru);font-weight:700;font-size:16px;letter-spacing:.06em;
+    padding:15px 26px;border-radius:999px;
+    box-shadow:0 8px 22px rgba(168,78,43,.5);
+    transition:transform .25s ease,box-shadow .25s ease,filter .25s ease;
+  }
+  .hero-cta::after{content:"↓";font-size:14px}
+  .hero-cta:hover{filter:brightness(1.06);transform:translateY(-2px);box-shadow:0 12px 26px rgba(168,78,43,.55)}
+  .hero-cta:active{transform:translateY(0)}
+  /* 丘の曲線 = ページ全体のディバイダーの母型。前面の丘はクリームで次のセクションへ食い込む */
+  .hero-scene{
+    display:block;width:100%;position:relative;z-index:2;
+    height:clamp(110px,26vw,210px);margin-top:-8px;
+  }
+
+  /* ===== 光沢スイープ（EC質感）共通 ===== */
+  .shine::before{
+    content:"";position:absolute;top:-20%;bottom:-20%;left:-10%;width:42%;
+    background:linear-gradient(105deg,transparent 0%,rgba(255,255,255,.45) 50%,transparent 100%);
+    transform:translateX(-140%) skewX(-18deg);
+    animation:shine 4s ease-in-out infinite;pointer-events:none;
+  }
+  @keyframes shine{
+    0%{transform:translateX(-140%) skewX(-18deg)}
+    30%{transform:translateX(320%) skewX(-18deg)}
+    100%{transform:translateX(320%) skewX(-18deg)}
+  }
+
+  /* ===== セクション共通: 色面バンド＋曲線ディバイダー ===== */
+  section{position:relative}
+  .band-cream{background:var(--cream)}
+  .band-white{background:#fff}
+  .divider{display:block;width:100%;height:clamp(30px,9vw,60px)}
+  .divider.flip{transform:scaleX(-1)}
+
+  /* 雑誌の扉ページ: 英字eyebrowは特大ゴースト文字にして見出しと重ねる */
+  .sec-head{margin-bottom:30px;position:relative}
+  .sec-eyebrow{
+    font-family:var(--serif);font-weight:800;line-height:1;
+    font-size:clamp(46px,13vw,72px);letter-spacing:.04em;
+    color:rgba(192,96,58,.14);white-space:nowrap;
+    margin-bottom:-.42em;user-select:none;
+  }
+  .sec-head h2{
+    position:relative;z-index:1;
+    font-family:var(--serif);font-size:clamp(26px,7vw,32px);font-weight:800;
+    color:var(--brown);line-height:1.5;letter-spacing:.02em;
+  }
+  .sec-head .h2-sub{font-size:13px;color:var(--sub);margin-top:6px;letter-spacing:.06em}
+
+  /* ===== スクロール出現（JSが動いた時だけ隠す＝JS失敗でも内容は見える） ===== */
+  .js .reveal:not(.stagger){opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+  .js .reveal:not(.stagger).in{opacity:1;transform:none}
+  /* カード内は 画像→数字→テキスト の順に80ms間隔で段差出現 */
+  .js .stagger .st{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease}
+  .js .stagger.in .st{opacity:1;transform:none}
+  .st1{transition-delay:0s}
+  .st2{transition-delay:.08s}
+  .st3{transition-delay:.16s}
+  .st4{transition-delay:.24s}
+  .st5{transition-delay:.32s}
+
+  /* ===== 正直な話: 余白で読ませる（呼吸のセクション） ===== */
+  /* .honest は section と内側の div.wrap の両方に付いている。
+     section だけに限定しないと、内側の .wrap の左右20pxを打ち消す／二重にしてしまう */
+  section.honest{padding:44px 0 56px}
+  .honest-inner{position:relative;padding-top:10px}
+  .honest-inner::before{
+    content:"“";position:absolute;top:-24px;left:-6px;
+    font-family:var(--serif);font-weight:800;font-size:88px;line-height:1;
+    color:rgba(192,96,58,.16);pointer-events:none;
+  }
+  .honest-label{
+    font-family:var(--serif);font-size:18px;font-weight:800;color:var(--brown);
+    letter-spacing:.24em;margin-bottom:14px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .honest-label::after{content:"";width:52px;height:2px;background:var(--sun)}
+  .honest-body{font-size:16px;line-height:2.15;color:var(--ink);max-width:34em}
+  /* 広い画面では文の途中の改行を無効にして、1文1行に戻す */
+  @media (min-width:600px){ .honest-body br.sp{display:none} }
+  /* 手描き風マーカー = 強調の役 */
+  .marker,.honest-body strong,.story p strong{
+    font-weight:700;color:var(--brown);
+    background:linear-gradient(transparent 58%,rgba(233,180,76,.55) 58%,rgba(233,180,76,.55) 94%,transparent 94%);
+  }
+
+  /* ===== ベスト3: 最高密度の売り場 ===== */
+  #best3{padding:0 0 56px}
+  #best3 .wrap{padding-top:34px}
+  .link-note{font-size:12px;color:var(--sub);margin:-14px 0 26px}
+
+  /* チップ = ラベルの役（山吹の塗り・焦げ茶文字） */
+  .chip{
+    display:inline-block;background:var(--sun);color:var(--brown);
+    font-family:var(--maru);font-weight:700;font-size:12px;line-height:1;
+    padding:7px 14px;border-radius:999px;letter-spacing:.08em;white-space:nowrap;
+  }
+
+  /* サムネ枠: 全カード必須。暖色フィルタで同一シリーズの写真に見せる */
+  .thumb-link{display:block;text-decoration:none;position:relative}
+  .thumb-frame{
+    position:relative;display:block;overflow:hidden;background:#4A3626;
+    aspect-ratio:16/9;
+  }
+  .thumb-frame img{
+    width:100%;height:100%;object-fit:cover;
+    filter:saturate(1.05) sepia(.08);
+    transition:transform .5s ease;
+  }
+  .thumb-link:hover .thumb-frame img{transform:scale(1.04)}
+  .thumb-frame::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(233,180,76,.10),rgba(192,96,58,.12));
+  }
+  /* 再生ボタンオーバーレイ: 画像そのものを動画リンクに */
+  .play{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:60px;height:60px;border-radius:50%;z-index:2;
+    background:rgba(255,255,255,.92);color:var(--terra-deep);
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;padding-left:5px;
+    box-shadow:0 6px 18px rgba(46,29,18,.35);
+    transition:transform .25s ease;
+  }
+  .thumb-link:hover .play{transform:translate(-50%,-50%) scale(1.08)}
+  /* キャプション=画像下・右寄せ（左は巨大ランク数字の居場所） */
+  .cap-link{
+    display:flex;align-items:center;justify-content:flex-end;gap:8px;
+    min-height:44px;padding:8px 14px 0 130px;
+    font-size:13px;font-weight:700;color:var(--terra-text);letter-spacing:.03em;
+    text-decoration:none;
+  }
+  .cap-link::before{content:"▶";font-size:10px;color:var(--terra)}
+  .cap-link:hover{text-decoration:underline}
+  .card-sub .cap-link{font-size:12px;padding-left:128px;white-space:nowrap}
+
+  /* リボン = 実績の役（1位サムネ左上） */
+  .ribbon{
+    position:absolute;top:14px;left:-8px;z-index:3;
+    background:linear-gradient(180deg,#B85A32,var(--terra-deep));
+    color:#fff;font-family:var(--maru);font-weight:700;font-size:12px;line-height:1;
+    padding:9px 14px 9px 12px;letter-spacing:.05em;
+    box-shadow:0 4px 12px rgba(46,29,18,.3);
+  }
+  .ribbon::after{
+    content:"";position:absolute;left:0;bottom:-8px;
+    border:4px solid transparent;border-top-color:#6E3016;border-right-color:#6E3016;
+  }
+
+  /* 巨大ランク数字: サムネの角に重ねて食い込ませる */
+  .media{position:relative}
+  .rank-num{
+    position:absolute;left:12px;bottom:-.33em;z-index:3;pointer-events:none;
+    font-family:var(--serif);font-weight:800;line-height:.78;
+    color:var(--terra);letter-spacing:-.02em;
+    text-shadow:0 3px 20px rgba(46,29,18,.35);
+  }
+  .rank-label{margin:0 0 10px}
+
+  /* --- 1位: 王座レイアウト（全幅・別格） --- */
+  .card{background:#fff}
+  .card-1{
+    margin:0 -20px 44px;
+    border-top:4px solid var(--sun);
+    box-shadow:0 14px 40px rgba(122,90,60,.22);
+  }
+  .card-1 .card-body{padding:4px 20px 26px}
+  .card-1 .rank-num{font-size:clamp(96px,27vw,124px)}
+  .card-1 h3{
+    font-family:var(--serif);font-size:clamp(20px,5.6vw,24px);font-weight:800;
+    line-height:1.55;margin:0 0 8px;color:var(--brown);
+  }
+
+  /* --- 2位・3位: インセットカード（王座より一回り小さく） --- */
+  .card-sub{
+    margin:0 0 30px;border-radius:18px;overflow:hidden;
+    border:1px solid var(--line);
+    box-shadow:0 6px 22px rgba(122,90,60,.14);
+  }
+  .card-sub .card-body{padding:4px 18px 22px}
+  .card-sub .rank-num{font-size:clamp(84px,23vw,96px)}
+  .card-sub h3{
+    font-size:18px;font-weight:700;line-height:1.55;margin:0 0 6px;color:var(--brown);
+  }
+
+  /* 数字が主役の価格表記 */
+  .price{font-size:13px;color:var(--sub);line-height:1.7}
+  .price b{
+    font-size:24px;font-weight:800;color:var(--brown);
+    font-family:var(--maru);letter-spacing:.01em;margin:0 1px;
+  }
+  .card-sub .price b{font-size:22px}
+
+  /* コメント: 引用符の役（黄色左ボーダーは廃止） */
+  .comment{
+    position:relative;font-size:14px;line-height:1.9;color:#4A3D2E;
+    margin:12px 0 18px;padding-left:26px;
+  }
+  .comment::before{
+    content:"“";position:absolute;left:0;top:-8px;
+    font-family:var(--serif);font-weight:800;font-size:34px;color:var(--terra);
+  }
+
+  /* ===== 購入ボタン: ECの押させる質感 ===== */
+  .btn-row{display:flex;gap:10px}
+  .btn{
+    position:relative;overflow:hidden;
+    flex:1;display:flex;align-items:center;justify-content:center;text-align:center;
+    text-decoration:none;color:#fff;font-size:14px;font-weight:700;white-space:nowrap;
+    padding:14px 24px 14px 8px;border-radius:12px;min-height:54px;letter-spacing:0;
+    transition:transform .25s ease,box-shadow .25s ease,filter .25s ease;
+  }
+  .btn::after{
+    content:"→";position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    font-size:13px;opacity:.9;
+  }
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
+  .btn:active{transform:translateY(0)}
+  .btn.rakuten{
+    background:linear-gradient(180deg,#D40000 0%,#A80000 100%);
+    box-shadow:0 6px 16px rgba(191,0,0,.35);
+  }
+  .btn.rakuten:hover{box-shadow:0 10px 20px rgba(191,0,0,.4)}
+  .btn.amazon{
+    background:linear-gradient(180deg,#37475A 0%,#232F3E 100%);
+    box-shadow:0 6px 16px rgba(35,47,62,.35);
+  }
+  .btn.amazon:hover{box-shadow:0 10px 20px rgba(35,47,62,.4)}
+  .btn:focus-visible,.video-link:focus-visible,.cta:focus-visible,.hero-cta:focus-visible,.thumb-link:focus-visible{
+    outline:3px solid var(--terra);outline-offset:2px;
+  }
+
+  /* T12 Pro: 実写が来るまでの専用プレースホルダー（暖色パターン＋腕時計シルエット） */
+  .ph-watch{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    background:
+      repeating-linear-gradient(-45deg,rgba(233,180,76,.16) 0 14px,rgba(233,180,76,0) 14px 28px),
+      linear-gradient(160deg,#F3DDBE 0%,#E8C08E 55%,#D9A263 100%);
+  }
+  .ph-watch::after{background:linear-gradient(180deg,rgba(233,180,76,.06),rgba(192,96,58,.08))}
+  .ph-watch svg{width:clamp(84px,22vw,110px);height:auto}
+  .ph-note{
+    font-family:var(--serif);font-size:10px;font-weight:700;letter-spacing:.34em;
+    color:#6E4A26;text-transform:uppercase;
+    align-self:flex-end;margin-right:14px;/* 左下の巨大ランク数字を避ける */
+  }
+
+  /* ===== カテゴリ: 楽天風リスト行（左88pxサムネ） ===== */
+  #category{padding:0 0 60px}
+  #category .wrap{padding-top:34px}
+  .cat{margin-bottom:40px;counter-increment:cat}
+  .cat h3{
+    font-family:var(--serif);font-size:19px;font-weight:800;color:var(--brown);
+    display:flex;align-items:baseline;gap:12px;margin-bottom:16px;letter-spacing:.04em;
+  }
+  .cat h3::before{
+    content:"0" counter(cat);
+    font-family:var(--serif);font-weight:800;font-size:34px;line-height:1;
+    color:rgba(192,96,58,.32);letter-spacing:0;
+  }
+  .cat h3::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--sun),rgba(233,180,76,0));align-self:center}
+  #category .wrap{counter-reset:cat}
+  .item{
+    display:grid;grid-template-columns:88px 1fr;grid-template-areas:"thumb main" "links links";
+    gap:6px 14px;align-items:start;
+    background:#fff;border:1px solid var(--line);border-radius:16px;
+    padding:14px;margin-bottom:14px;
+    box-shadow:0 3px 12px rgba(122,90,60,.1);
+  }
+  .item-thumb{
+    grid-area:thumb;position:relative;display:block;
+    width:88px;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#4A3626;
+  }
+  .item-thumb img{
+    width:100%;height:100%;object-fit:cover;
+    filter:saturate(1.05) sepia(.08);
+    transform:scale(1.6);/* 焼き込み文字を枠外へ追い出す */
+  }
+  .item-thumb::after{
+    content:"";position:absolute;inset:0;pointer-events:none;border-radius:12px;
+    background:linear-gradient(180deg,rgba(233,180,76,.10),rgba(192,96,58,.12));
+  }
+  a.item-thumb .mini-play{
+    position:absolute;right:5px;bottom:5px;z-index:2;
+    width:24px;height:24px;border-radius:50%;
+    background:rgba(255,255,255,.92);color:var(--terra-deep);
+    display:flex;align-items:center;justify-content:center;
+    font-size:9px;padding-left:2px;
+    box-shadow:0 2px 8px rgba(46,29,18,.3);
+  }
+  .item-main{grid-area:main;min-width:0}
+  .item .name{font-weight:700;font-size:15px;line-height:1.55;color:var(--brown)}
+  .item .desc{font-size:13px;color:var(--sub);margin-top:2px;line-height:1.7}
+  .item .desc b{
+    font-size:17px;font-weight:800;color:var(--brown);font-family:var(--maru);margin:0 1px;
+  }
+  .item-links{grid-area:links;margin-top:6px}
+  .item .btn{font-size:13px;padding:10px 22px 10px 8px;min-height:44px;border-radius:10px}
+  .item .btn::after{right:9px;font-size:12px}
+  .video-link{
+    display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;
+    min-height:44px;color:var(--terra-text);
+    text-decoration:none;font-size:13px;font-weight:700;padding:9px 6px;letter-spacing:.03em;
+    border-radius:10px;background:rgba(233,180,76,.14);
+    transition:background-color .25s ease,transform .25s ease;
+  }
+  .video-link::before{content:"▶";font-size:10px;color:var(--terra)}
+  .video-link:hover{background:rgba(233,180,76,.28);transform:translateY(-1px)}
+
+  /* ===== 日没の帯: クリーム→焦げ茶への暗転を物語として見せる ===== */
+  .dusk{
+    height:clamp(96px,22vw,150px);
+    background:linear-gradient(180deg,#F2D3A6 0%,#DE9A5B 40%,#9A5735 72%,#4A3626 100%);
+    position:relative;overflow:hidden;
+  }
+  .dusk .divider{position:absolute;top:0;left:0;z-index:2}
+  /* 夕日が丘の稜線の向こうへ沈む（R3から移植。transformのみ） */
+  .dusk-sun{
+    position:absolute;left:16%;bottom:18px;width:72px;height:72px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,214,140,.95),rgba(240,150,80,.4) 58%,rgba(240,150,80,0) 74%);
+    mix-blend-mode:screen;
+    animation:sunset 12s ease-in-out infinite alternate;
+  }
+  @keyframes sunset{
+    from{transform:translateY(0)}
+    to{transform:translateY(16px)}
+  }
+  .dusk-hill{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:46px}
+
+  /* ===== 夢企画（焦げ茶＝感情の山場・ここだけ明朝で語る） ===== */
+  .dream{
+    background:linear-gradient(180deg,#4A3626 0%,var(--brown) 45%,var(--brown-deep) 100%);
+    color:var(--brown-ink);padding:56px 0 72px;
+  }
+  .dream .sec-eyebrow{color:rgba(233,180,76,.13)}
+  .dream .sec-head h2{color:var(--brown-ink)}
+  .dream .sec-head .h2-sub{color:#CBB79E}
+  .dream-card{
+    background:rgba(255,255,255,.05);border:1px solid rgba(233,180,76,.28);border-radius:18px;
+    padding:26px 22px;margin-bottom:18px;overflow:hidden;
+  }
+  .dream-label{
+    font-size:11px;font-weight:700;color:var(--sun);letter-spacing:.3em;
+    text-transform:uppercase;
+  }
+  .dream-card h3{
+    font-family:var(--serif);font-size:clamp(23px,6.4vw,28px);font-weight:800;
+    margin:12px 0 10px;line-height:1.65;color:var(--brown-ink);letter-spacing:.03em;
+  }
+  .dream-card p{font-size:15px;color:#E3D5C4;line-height:2}
+  /* 引用は映画の字幕のように: 字間を開けて中央に */
+  .dream-quote{
+    font-family:var(--serif);text-align:center;
+    font-size:clamp(20px,5.8vw,26px);font-weight:800;
+    margin:52px 0 10px;line-height:2.3;letter-spacing:.14em;
+    color:var(--brown-ink);text-wrap:balance;
+  }
+  .dream-quote-sub{text-align:center;font-size:13px;color:#CBB79E;letter-spacing:.1em}
+
+  /* ===== ストーリー・窓口 ===== */
+  .story{padding:0 0 64px}
+  .story .wrap{padding-top:34px}
+  .story p{font-size:16px;margin-bottom:16px;color:#4A3D2E;line-height:2.05}
+  .cta-row{display:flex;flex-direction:column;gap:12px;margin-top:30px}
+  .cta{
+    position:relative;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+    text-align:center;text-decoration:none;font-weight:700;font-size:15px;
+    font-family:var(--maru);
+    padding:16px;border-radius:14px;min-height:56px;letter-spacing:.05em;
+    transition:transform .25s ease,box-shadow .25s ease,filter .25s ease,background-color .25s ease;
+  }
+  .cta.main{
+    background:linear-gradient(180deg,var(--terra) 0%,var(--terra-deep) 100%);color:#fff;
+    box-shadow:0 8px 20px rgba(168,78,43,.4);
+  }
+  .cta.main:hover{filter:brightness(1.06);transform:translateY(-2px);box-shadow:0 12px 24px rgba(168,78,43,.45)}
+  .cta.sub{border:2px solid var(--terra-deep);color:var(--terra-text)}
+  .cta.sub:hover{background:rgba(192,96,58,.08);transform:translateY(-2px)}
+
+  footer{
+    background:var(--brown-deep);text-align:center;font-size:12px;color:#D9C7B2;
+    line-height:2;
+  }
+  footer .foot-inner{padding:28px 20px 40px;max-width:680px;margin:0 auto}
+  footer p{margin-bottom:14px}
+  footer p:last-child{margin-bottom:0}
+  .foot-disclosure{
+    font-family:var(--maru);font-weight:700;font-size:13px;color:var(--sun);
+    letter-spacing:.1em;margin-bottom:8px;
+  }
+
+  /* ===== 画面下部固定のミニCTA: ベスト3通過後に出現・夢セクションでは隠す。
+     JSが無ければ画面外に留まったまま＝ページはそのまま機能する ===== */
+  .sticky-bar{
+    position:fixed;left:0;right:0;bottom:0;z-index:60;
+    padding:8px 16px calc(8px + env(safe-area-inset-bottom));
+    background:#fff;border-top:1px solid var(--line);
+    transform:translateY(120%);transition:transform .35s ease;
+  }
+  .sticky-bar.show{transform:none}
+  .sticky-btn{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    min-height:44px;max-width:640px;margin:0 auto;
+    background:linear-gradient(180deg,var(--terra) 0%,var(--terra-deep) 100%);color:#fff;
+    font-family:var(--maru);font-weight:700;font-size:14px;letter-spacing:.06em;
+    text-decoration:none;border-radius:999px;
+    box-shadow:0 4px 12px rgba(168,78,43,.35);
+  }
+  .sticky-btn::after{content:"↑";font-size:12px}
+  .sticky-btn:focus-visible{outline:3px solid var(--terra);outline-offset:2px}
+
+  /* ===== 600px以上: 王座はさらに大きく、2位3位は並べて従える ===== */
+  @media (min-width:640px){
+    .card-1{margin-left:0;margin-right:0;border-radius:22px;overflow:hidden}
+    .cta-row{flex-direction:row}
+    .cta{flex:1}
+    .dream{padding:72px 0 88px}
+  }
+  @media (min-width:720px){
+    .duo{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .duo .card-sub{margin-bottom:0}
+  }
+
+  /* 動きを減らす設定の人には全アニメーションを止める（要素は見える状態） */
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none !important;transition:none !important}
+    .js .reveal:not(.stagger),.js .stagger .st{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="pr-note"><span>広告・PR｜アフィリエイト広告を利用しています</span><span>メーカーから提供を受けた商品を含みます</span></div>
+
+<header class="hero">
+  <div class="hero-art">
+    <img src="assets/banner-dream.jpg" alt="夕日の海沿いコースで笑い合う親子「親子で挑むゴルフ人生」" width="2048" height="1152" fetchpriority="high">
+  </div>
+  <div class="hero-sky" aria-hidden="true">
+    <div class="sun"></div>
+    <div class="cloud cloud-a"></div>
+    <div class="cloud cloud-b"></div>
+  </div>
+  <div class="wrap">
+    <img class="hero-logo" src="assets/logo-circle.jpg" alt="GOLFAMI 親子ゴルフチャンネル ロゴ" width="900" height="900">
+    <p class="eyebrow"><span class="brand">Golfami</span><span class="brand-sub">Online Store — 親子ゴルフチャンネル</span></p>
+    <h1>親孝行から始まった、<br>親子のゴルフチャンネル。</h1>
+    <p class="lead">ここに並べているのは、動画の中で<br>親子が<strong>実際に紹介してきた物</strong>。</p>
+    <a class="hero-cta" href="#best3">人気ベスト3を見る</a>
+  </div>
+  <!-- 親子写真が届いたら、この情景イラストを写真に差し替える -->
+  <svg class="hero-scene" viewBox="0 0 750 240" preserveAspectRatio="xMidYMax slice" role="img" aria-label="朝焼けのゴルフコースを歩く親子の情景">
+    <path d="M0 182 Q 190 112 410 162 T 750 144 V 240 H 0 Z" fill="#8C6845"/>
+    <!-- 丘の上を歩く親子のシルエット -->
+    <g fill="#4A3626">
+      <circle cx="188" cy="104" r="7.5"/>
+      <path d="M181 114 Q 188 110 195 114 L 194 146 L 190 146 L 189 130 L 187 130 L 186 146 L 182 146 Z"/>
+      <circle cx="214" cy="117" r="5.5"/>
+      <path d="M209 124 Q 214 121 219 124 L 218 147 L 215 147 L 214.5 136 L 213.5 136 L 213 147 L 210 147 Z"/>
+      <path d="M196 118 L 208 124 L 207 126 L 195 121 Z"/>
+      <ellipse cx="200" cy="149" rx="24" ry="3" opacity=".35"/>
+    </g>
+    <g>
+      <rect x="560" y="120" width="2.5" height="62" fill="#FBF7F0"/>
+      <path d="M562.5 120 L 593 129 L 562.5 138 Z" fill="#C0603A"/>
+      <ellipse cx="561" cy="183" rx="15" ry="3.5" fill="#6B4E33"/>
+    </g>
+    <path d="M0 216 Q 240 164 500 204 T 750 194 V 240 H 0 Z" fill="#5A4128"/>
+    <path d="M0 228 Q 200 190 440 216 T 750 210 V 240 H 0 Z" fill="#FBF7F0"/>
+  </svg>
+</header>
+
+<main>
+
+<section class="honest band-cream">
+  <div class="wrap honest">
+    <div class="honest-inner reveal">
+      <p class="honest-label">先に、正直な話</p>
+      <!-- br.sp = スマホ幅だけで効く改行。行の長さを揃え、1文字だけ残るのを防ぐ -->
+      <p class="honest-body">ここは僕らの紹介リンクのページです。<br><strong>どこで買っても、値段は同じ。</strong><br>ここから買ってもらえると、<br class="sp">ショップから数％が僕らに届いて、<br class="sp">そのまま<strong>親子の夢の貯金</strong>になります。<br>同じ買い物なら応援になるので、<br class="sp">もし気になった商品があれば、<br class="sp"><strong>ここから購入してもらえたら嬉しいです。</strong><br><strong>応援、よろしくお願いします。</strong></p>
+    </div>
+  </div>
+</section>
+
+<section id="best3" class="band-white">
+  <svg class="divider" viewBox="0 0 750 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 Q 187 6 410 26 T 750 18 V 0 H 0 Z" fill="#FBF7F0"/></svg>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-eyebrow" aria-hidden="true">Best Gear</p>
+      <h2>親子が選ぶ、人気ベスト3</h2>
+      <p class="h2-sub">紹介した動画と一緒にどうぞ</p>
+    </div>
+    <p class="link-note">※購入ボタンは準備中のため、いまは各ショップの検索結果に飛びます</p>
+
+    <!-- 1位: 王座レイアウト -->
+    <article class="card card-1 reveal stagger">
+      <!-- 動画「革命的な素振り棒」(dfZsW1cBXao) = 50万回再生。チャンネル最大のヒット回 -->
+      <div class="media st st1">
+        <a class="thumb-link" href="https://www.youtube.com/watch?v=dfZsW1cBXao">
+          <span class="thumb-frame">
+            <img src="https://i.ytimg.com/vi/dfZsW1cBXao/hqdefault.jpg" alt="" width="480" height="360" fetchpriority="high">
+            <span class="ribbon">50万回再生</span>
+            <span class="play" aria-hidden="true">▶</span>
+          </span>
+        </a>
+        <span class="rank-num st st2">01</span>
+      </div>
+      <a class="cap-link" href="https://www.youtube.com/watch?v=dfZsW1cBXao">紹介した回を見る</a>
+      <div class="card-body">
+        <!-- TODO: 提供/自腹の区分は本人確認のうえ確定する（現状はjournalの記録に基づく） -->
+        <p class="rank-label st st3"><small class="chip">いちばん人気</small><small class="rel-tag pr">メーカー提供</small></p>
+        <h3 class="st st3">ボイスキャディ スイングスティック（素振り棒）</h3>
+        <p class="price st st4">約<b>2万</b>円／スマホ連携でスイングスピード・飛距離が測れる</p>
+        <p class="comment st st4">動画から100本以上売れた、うちの一番人気。振るだけで練習になる。</p>
+        <div class="btn-row st st5">
+          <!-- TODO: 楽天アフィリリンクに差し替え -->
+          <a class="btn rakuten shine" href="https://search.rakuten.co.jp/search/mall/%E3%83%9C%E3%82%A4%E3%82%B9%E3%82%AD%E3%83%A3%E3%83%87%E3%82%A3%20%E3%82%B9%E3%82%A4%E3%83%B3%E3%82%B0%E3%82%B9%E3%83%86%E3%82%A3%E3%83%83%E3%82%AF/" rel="nofollow sponsored">楽天で見る</a>
+          <!-- TODO: Amazonアソシエイトリンクに差し替え -->
+          <a class="btn amazon shine" href="https://www.amazon.co.jp/s?k=%E3%83%9C%E3%82%A4%E3%82%B9%E3%82%AD%E3%83%A3%E3%83%87%E3%82%A3+%E3%82%B9%E3%82%A4%E3%83%B3%E3%82%B0%E3%82%B9%E3%83%86%E3%82%A3%E3%83%83%E3%82%AF" rel="nofollow sponsored">Amazonで見る</a>
+        </div>
+      </div>
+    </article>
+
+    <div class="duo">
+      <!-- 2位 -->
+      <article class="card card-sub reveal stagger">
+        <div class="media st st1">
+          <a class="thumb-link" href="https://www.youtube.com/watch?v=hxsa6JwYJKI">
+            <span class="thumb-frame">
+              <img src="https://i.ytimg.com/vi/hxsa6JwYJKI/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+              <span class="play" aria-hidden="true">▶</span>
+            </span>
+          </a>
+          <span class="rank-num st st2">02</span>
+        </div>
+        <a class="cap-link" href="https://www.youtube.com/watch?v=hxsa6JwYJKI">実際に使ってる回を見る</a>
+        <div class="card-body">
+          <p class="rank-label st st3"><small class="chip">夏の必需品</small><small class="rel-tag own">自分で購入</small></p>
+          <h3 class="st st3">冷感ポンチョ（濡らして絞ると冷える）</h3>
+          <p class="price st st4">約<b>4,000</b>円／UVカット・フード付き</p>
+          <p class="comment st st4">案件じゃなく自腹で買ったやつ。「忖度なしで本当にいい」。</p>
+          <div class="btn-row st st5">
+            <!-- TODO: 楽天アフィリリンクに差し替え -->
+            <a class="btn rakuten" href="https://search.rakuten.co.jp/search/mall/%E5%86%B7%E6%84%9F%E3%83%9D%E3%83%B3%E3%83%81%E3%83%A7%20%E3%82%B4%E3%83%AB%E3%83%95/" rel="nofollow sponsored">楽天で見る</a>
+            <!-- TODO: Amazonアソシエイトリンクに差し替え -->
+            <a class="btn amazon" href="https://www.amazon.co.jp/s?k=%E5%86%B7%E6%84%9F%E3%83%9D%E3%83%B3%E3%83%81%E3%83%A7+%E3%82%B4%E3%83%AB%E3%83%95" rel="nofollow sponsored">Amazonで見る</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3位 -->
+      <article class="card card-sub reveal stagger">
+        <!-- 動画「【レビュー】新型ゴルフナビ！ボイスキャディ T12 PRO」(3o0OgMpHcX4) -->
+        <div class="media st st1">
+          <a class="thumb-link" href="https://www.youtube.com/watch?v=3o0OgMpHcX4">
+            <span class="thumb-frame">
+              <img src="https://i.ytimg.com/vi/3o0OgMpHcX4/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+              <span class="play" aria-hidden="true">▶</span>
+            </span>
+          </a>
+          <span class="rank-num st st2">03</span>
+        </div>
+        <a class="cap-link" href="https://www.youtube.com/watch?v=3o0OgMpHcX4">レビュー回を見る</a>
+        <div class="card-body">
+          <p class="rank-label st st3"><small class="chip">親父の相棒</small><small class="rel-tag pr">メーカー提供</small></p>
+          <h3 class="st st3">ボイスキャディ T12 Pro（GPSゴルフウォッチ）</h3>
+          <p class="price st st4">約<b>6万</b>円／コース表示・残り距離が腕元でわかる</p>
+          <p class="comment st st4">70歳の親父が使っているGPSウォッチ。「70歳でも使える」が親子で試した結論。</p>
+          <div class="btn-row st st5">
+            <!-- TODO: 楽天アフィリリンクに差し替え -->
+            <a class="btn rakuten" href="https://search.rakuten.co.jp/search/mall/%E3%83%9C%E3%82%A4%E3%82%B9%E3%82%AD%E3%83%A3%E3%83%87%E3%82%A3%20T12%20Pro/" rel="nofollow sponsored">楽天で見る</a>
+            <!-- TODO: Amazonアソシエイトリンクに差し替え -->
+            <a class="btn amazon" href="https://www.amazon.co.jp/s?k=%E3%83%9C%E3%82%A4%E3%82%B9%E3%82%AD%E3%83%A3%E3%83%87%E3%82%A3+T12+Pro" rel="nofollow sponsored">Amazonで見る</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="category" class="band-cream">
+  <svg class="divider flip" viewBox="0 0 750 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 Q 187 6 410 26 T 750 18 V 0 H 0 Z" fill="#ffffff"/></svg>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-eyebrow" aria-hidden="true">Category</p>
+      <h2>カテゴリで探す</h2>
+      <p class="h2-sub">数は絞っています。動画で紹介した物だけ。</p>
+    </div>
+
+    <div class="cat">
+      <h3>距離計・GPS</h3>
+      <div class="item reveal">
+        <!-- TODO: SLミニ紹介回のサムネ/URLを本人に確認して差し替え（仮サムネは別商品の回だったため撤去） -->
+        <span class="item-thumb" style="background:linear-gradient(135deg,#F3DDBE,#E9C99A);display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 60 60" width="44" height="44" aria-hidden="true"><rect x="10" y="18" width="40" height="26" rx="6" fill="rgba(62,43,32,.55)"/><circle cx="38" cy="31" r="8" fill="#F3DDBE"/><circle cx="38" cy="31" r="4" fill="rgba(62,43,32,.55)"/></svg>
+        </span>
+        <div class="item-main">
+          <p class="name">ボイスキャディ SLミニ（レーザー距離計）<small class="rel-tag pr">メーカー提供</small></p>
+          <p class="desc">約<b>5万</b>円。ラウンドの距離計測はこれ。</p>
+        </div>
+        <div class="item-links">
+          <div class="btn-row">
+            <!-- TODO: アフィリリンク差し替え -->
+            <a class="btn rakuten" href="https://search.rakuten.co.jp/search/mall/%E3%83%9C%E3%82%A4%E3%82%B9%E3%82%AD%E3%83%A3%E3%83%87%E3%82%A3%20SL%E3%83%9F%E3%83%8B/" rel="nofollow sponsored">楽天</a>
+            <a class="btn amazon" href="https://www.amazon.co.jp/s?k=%E3%83%9C%E3%82%A4%E3%82%B9%E3%82%AD%E3%83%A3%E3%83%87%E3%82%A3+SL%E3%83%9F%E3%83%8B" rel="nofollow sponsored">Amazon</a>
+          </div>
+        </div>
+      </div>
+      <div class="item reveal">
+        <!-- 動画「【300万円 vs 2万円】トラックマンとボイスキャディSC200PLUSを本気で比べた結果…」(MtPev9FDZdk) -->
+        <a class="item-thumb" href="https://www.youtube.com/watch?v=MtPev9FDZdk" aria-label="SC200PLUSとトラックマンを比べた回を見る"><img src="https://i.ytimg.com/vi/MtPev9FDZdk/hqdefault.jpg" alt="" width="480" height="360" loading="lazy"><span class="mini-play" aria-hidden="true">▶</span></a>
+        <div class="item-main">
+          <p class="name">ボイスキャディ SC200+（弾道計測器）<small class="rel-tag pr">メーカー提供</small></p>
+          <p class="desc">約<b>2万</b>円。練習場で球速・飛距離をチェック。</p>
+        </div>
+        <div class="item-links">
+          <div class="btn-row">
+            <!-- TODO: アフィリリンク差し替え -->
+            <a class="btn rakuten" href="https://search.rakuten.co.jp/search/mall/%E3%83%9C%E3%82%A4%E3%82%B9%E3%82%AD%E3%83%A3%E3%83%87%E3%82%A3%20SC200/" rel="nofollow sponsored">楽天</a>
+            <a class="btn amazon" href="https://www.amazon.co.jp/s?k=%E3%83%9C%E3%82%A4%E3%82%B9%E3%82%AD%E3%83%A3%E3%83%87%E3%82%A3+SC200" rel="nofollow sponsored">Amazon</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cat">
+      <h3>練習器具</h3>
+      <div class="item reveal">
+        <a class="item-thumb" href="https://www.youtube.com/watch?v=hlWoHWS1voE" aria-label="バランススティックを検証した回を見る"><img src="https://i.ytimg.com/vi/hlWoHWS1voE/hqdefault.jpg" alt="" width="480" height="360" loading="lazy"><span class="mini-play" aria-hidden="true">▶</span></a>
+        <div class="item-main">
+          <p class="name">バランススティック（韓国の特許ギア）<small class="rel-tag pr">タイアップ</small></p>
+          <p class="desc">日本初上陸の練習スティック。動画で親子が検証済み。</p>
+        </div>
+        <div class="item-links">
+          <!-- 販売はMakuake先行販売が終了。一般販売の導線が決まったらボタンを追加 -->
+          <a class="video-link" href="https://www.youtube.com/watch?v=hlWoHWS1voE">検証した回を見る（販売再開待ち）</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="cat">
+      <h3>夏の暑さ対策</h3>
+      <div class="item reveal">
+        <a class="item-thumb" href="https://www.youtube.com/watch?v=vH1iKxt0LZs" aria-label="空調服を試した夏対策の回を見る"><img src="https://i.ytimg.com/vi/vH1iKxt0LZs/hqdefault.jpg" alt="" width="480" height="360" loading="lazy"><span class="mini-play" aria-hidden="true">▶</span></a>
+        <div class="item-main">
+          <!-- TODO: EFFLORESCENCE（福岡発ブランド）との関係が提供/自腹か本人確認のうえ rel-tag を付ける -->
+          <p class="name">空調服（EFFLORESCENCE・ファン付きウェア）</p>
+          <p class="desc">服の中で風が回る。「めっちゃ涼しい」。</p>
+        </div>
+        <div class="item-links">
+          <div class="btn-row">
+            <!-- TODO: アフィリリンク差し替え -->
+            <a class="btn rakuten" href="https://search.rakuten.co.jp/search/mall/%E7%A9%BA%E8%AA%BF%E6%9C%8D%20%E3%82%B4%E3%83%AB%E3%83%95/" rel="nofollow sponsored">楽天</a>
+            <a class="btn amazon" href="https://www.amazon.co.jp/s?k=%E7%A9%BA%E8%AA%BF%E6%9C%8D+%E3%82%B4%E3%83%AB%E3%83%95" rel="nofollow sponsored">Amazon</a>
+          </div>
+          <a class="video-link" href="https://www.youtube.com/watch?v=vH1iKxt0LZs">夏対策の回を見る</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 日没: クリームから焦げ茶への暗転 -->
+<div class="dusk" aria-hidden="true">
+  <svg class="divider" viewBox="0 0 750 48" preserveAspectRatio="none"><path d="M0 30 Q 187 6 410 26 T 750 18 V 0 H 0 Z" fill="#FBF7F0"/></svg>
+  <span class="dusk-sun"></span>
+  <svg class="dusk-hill" viewBox="0 0 750 60" preserveAspectRatio="none">
+    <path d="M0 42 Q 160 10 340 30 T 750 22 L 750 60 L 0 60 Z" fill="#4A3626"/>
+  </svg>
+</div>
+
+<section class="dream" id="dream">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-eyebrow" aria-hidden="true">Our Dream</p>
+      <h2>このページの収益の使い道</h2>
+      <p class="h2-sub">買ってくれたあなたは、この夢のスポンサーです</p>
+    </div>
+
+    <div class="dream-card reveal">
+      <p class="dream-label">Next ── 次の夢企画</p>
+      <!-- TODO: 本人が夢企画を確定したら差し替え -->
+      <h3>初の海外ロケ、<br>「台湾・親子対決旅」</h3>
+      <p>台湾トップアマとの親子真剣勝負。聖地への第一歩となる、初めての海外ラウンドです。</p>
+    </div>
+
+    <div class="dream-card reveal">
+      <p class="dream-label">Goal ── 最終ゴール</p>
+      <h3>親父を、<br>セントアンドリュースへ。</h3>
+      <p>ゴルフの聖地・セントアンドリュース。70歳の親父をこのチャンネルの収益で連れて行くのが、GOLFAMIの最終ゴールです。収益は全額、この夢のために貯金しています。</p>
+    </div>
+
+    <p class="dream-quote reveal">「親父とゴルフできるのも、<br>あと何年だろう」</p>
+    <p class="dream-quote-sub">だから記録に残す。収益で、親孝行をする。</p>
+  </div>
+</section>
+
+<section class="story band-cream" id="story">
+  <svg class="divider" viewBox="0 0 750 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 Q 187 6 410 26 T 750 18 V 0 H 0 Z" fill="#362419"/></svg>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-eyebrow" aria-hidden="true">About</p>
+      <h2>GOLFAMIについて</h2>
+    </div>
+    <p>GOLFAMIは、福岡の親子2人で運営するゴルフチャンネルです。目的はシンプルで、<strong>親孝行がしたい。楽しくゴルフがしたい。ゴルフを楽しむ人を増やしたい。</strong>この3つだけです。</p>
+    <p>ここに並べる道具は、案件・自腹にかかわらず、動画の中で実際に紹介したものだけに絞っています。</p>
+    <div class="cta-row reveal">
+      <a class="cta main" href="https://www.youtube.com/channel/UC2KiF7XifrmpRlvxrTpsZgg">チャンネルを見る</a>
+      <a class="cta sub" href="https://www.youtube.com/channel/UC2KiF7XifrmpRlvxrTpsZgg/about">お仕事のご依頼はこちら</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <svg class="divider flip" viewBox="0 0 750 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 Q 187 6 410 26 T 750 18 V 0 H 0 Z" fill="#FBF7F0"/></svg>
+  <div class="foot-inner">
+    <p class="foot-disclosure">広告・PRについて</p>
+    <p>本ページはアフィリエイト広告（楽天アフィリエイト・Amazonアソシエイト）を利用しています。<br>
+    「メーカー提供」「タイアップ」と表示した商品は、メーカー等から商品の提供または対価を受けて紹介しています。<br>
+    いずれの商品も、動画の中で実際に紹介したものです。</p>
+    <!-- Amazonアソシエイト・プログラム運営規約で掲示が義務付けられている定型文（変更しないこと） -->
+    <p>Amazonのアソシエイトとして、GOLFAMIは適格販売により収入を得ています。</p>
+    <p>掲載の価格は紹介時点のおおよその目安です。価格および在庫状況は変動します。最新の価格・在庫は各ショップの商品ページでご確認ください。</p>
+    <p>運営: GOLFAMI 親子ゴルフチャンネル</p>
+  </div>
+</footer>
+
+<div class="sticky-bar" id="sticky-bar">
+  <a class="sticky-btn" href="#best3">人気ベスト3を見る</a>
+</div>
+
+<script>
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){
+    for(var i=0;i<els.length;i++){els[i].classList.add('in');}
+    return;
+  }
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}
+    });
+  },{threshold:0.12,rootMargin:'0px 0px -32px 0px'});
+  els.forEach(function(el){io.observe(el);});
+
+  /* 下部固定ミニCTA: ベスト3を過ぎたら出す・ヒーローとベスト3と夢セクションでは隠す */
+  var bar=document.getElementById('sticky-bar');
+  var hero=document.querySelector('.hero');
+  var best=document.getElementById('best3');
+  var dream=document.getElementById('dream');
+  if(bar&&hero&&best&&dream){
+    var vis={h:true,b:false,d:false};
+    var upd=function(){bar.classList.toggle('show',!vis.h&&!vis.b&&!vis.d);};
+    var io2=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.target===hero){vis.h=e.isIntersecting;}
+        if(e.target===best){vis.b=e.isIntersecting;}
+        if(e.target===dream){vis.d=e.isIntersecting;}
+      });
+      upd();
+    },{threshold:0});
+    io2.observe(hero);io2.observe(best);io2.observe(dream);
+  }
+})();
+</script>
+
+</body>
+</html>
