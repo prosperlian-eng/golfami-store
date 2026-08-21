@@ -17,41 +17,65 @@
 
 ---
 
-## 🔴 今すぐ知るべきこと（2026-08-21 時点で未完了）
+## 🔴 今すぐ知るべきこと（2026-08-21 14:20 時点）
 
-### ドメイン切替が途中で、**サイトが一時的に見られない**
+### ① ドメイン切替はほぼ完了。ただし本人のPCからだけ見えない
 
-**状況**:
-- golfami.jp のDNS設定（GitHub PagesのIP 4つ + www）は投入済み → Xserverの権威DNSでは正しく引ける
-- ネームサーバーも `ns1〜3.xdomain.ne.jp` に変更済み（whoisには反映済み）
-- **しかしJPレジストリ側の委任情報がまだ `ns1〜5.xserver.jp` のまま**＝一般のDNSからは名前が引けない
-- GitHub PagesにCNAME(golfami.jp)を設定したため、**旧URLは golfami.jp へ301転送される**
-- 結果: **golfami.jp も旧URLも、今は開けない**
+**サイトは稼働中**: `http://golfami.jp/` は 200 OK。世界中のDNS（Google/Cloudflare/Quad9/OpenDNS）が正しく解決。
+スマホ（モバイル回線）からは表示確認済み。
 
-**放置してよいか**: JPレジストリへの反映は通常数時間で完了する。完了すれば自動的に両方生きる。
-バックグラウンドで見張りスクリプトを走らせてあり、浸透を検知したらHTTPS証明書の発行を待って
-`https_enforced=true` まで自動で仕上げる設計（`scratchpad/domain_watch.sh`。ただしセッション終了で消える）。
+**本人のPCだけ見えない理由**:
+- 契約プロバイダのDNS（240d:12:4:1b00:152:165:245:1）が**古い委任情報をキャッシュ**しており SERVFAIL を返す
+- JPゾーンのNSレコードは **TTL 86400（24時間）** のため、最大で翌日まで残る可能性がある
+- DNSSEC は未設定（DSレコードなし）＝設定ミスではなく純粋なキャッシュ切れ待ち
+- 本人の判断は「**待つ**」（2026-08-21）
 
-**もし急いで復旧したいなら**（サイトを今すぐ見せたい場合の応急処置）:
+**すぐ直したくなった場合の手段**（どちらもパスワード要／分身は実行不可）:
+- Chromeだけ: `chrome://settings/security` →「セキュアDNSを使用する」ON →「別のプロバイダ」→ Google
+- Mac全体: システム設定 > ネットワーク > Wi-Fi > 詳細 > DNS に `8.8.8.8` を追加
+
+**確認コマンド**:
 ```bash
-# GitHub Pagesのカスタムドメインを一旦外す → 旧URLが復活する
-gh api -X PUT repos/prosperlian-eng/golfami-store/pages -f cname=""
-# DNS浸透後に戻す
-gh api -X PUT repos/prosperlian-eng/golfami-store/pages -f cname=golfami.jp
+dig +short A golfami.jp                    # 引ければ解決
+dig +short A golfami.jp @8.8.8.8           # 外の世界（既にOK）
+curl -sI -H "Host: golfami.jp" http://185.199.108.153/ | head -1   # サイト本体（既に200）
 ```
-※ 外した場合、リポジトリの `CNAME` ファイルも一旦消さないとpush時に再設定されるので注意。
 
-**浸透確認コマンド**:
-```bash
-dig +short NS golfami.jp @a.dns.jp     # ns1-3.xdomain.ne.jp になれば委任OK
-dig +short A golfami.jp @8.8.8.8       # 185.199.10x.153 が返ればDNS浸透OK
-curl -sI https://golfami.jp/ | head -1 # 200になれば完了
-gh api repos/prosperlian-eng/golfami-store/pages --jq '{cname:.cname,https:.https_enforced,cert:.https_certificate.state}'
-```
-証明書が `approved`/`issued` になったら:
+### ② HTTPS証明書が「new」のまま止まっている
+
+`gh api repos/prosperlian-eng/golfami-store/pages --jq '.https_certificate.state'` が **1時間以上 `new`** のまま。
+DNSは正しく、http は200なので条件は揃っている。GitHub側の処理待ちと思われる。
+
+**発行されたら実行すること**:
 ```bash
 gh api -X PUT repos/prosperlian-eng/golfami-store/pages -F https_enforced=true
 ```
+**動かない場合の対処**（一度効果があった手）: カスタムドメインを外して再設定するとGitHubがDNS再検証を走らせる
+```bash
+gh api -X PUT repos/prosperlian-eng/golfami-store/pages -f cname=""
+sleep 15
+gh api -X PUT repos/prosperlian-eng/golfami-store/pages -f cname=golfami.jp
+```
+
+### ③ 未反映の改善: 公式ストアへの差し替え（リンク取得済み）
+
+本人の要望「できるだけ公式から、％が高いものに」への対応途中。
+
+**調査結果**: ボイスキャディ製品は**全ショップ一律 料率4.0%**（公式ストアも同じ）。料率は上げられない。
+ただし **Voice Caddie公式ストア（voice-caddie-japan）** が楽天にあり、同価格＋ポイント10倍＋おまけ付きなので
+公式へ差し替える価値がある。
+
+| 商品 | 公式ストアのリンク | 状態 |
+|---|---|---|
+| SC200 PLUS+ (24,200円・ポイント10倍) | `https://a.r10.to/hPn7b9` | **取得済み・未反映** |
+| SS10 (19,800円・ポイント10倍+ボールタオル) | 未取得 | 公式に在庫あり |
+| SL mini (48,400円・ポイント10倍+氷のう) | 未取得 | ※現行つるや41,800円より高い |
+| T12 PRO (59,950円・グローブ+ポイント10倍) | 未取得 | ※現行つるや55,000円より高い |
+
+**注意**: T12 PROとSL miniは公式の方が定価が高い（ポイント10倍で実質は逆転する）。
+本人に「安さ優先か公式優先か」を確認してから差し替えること。
+
+**Amazonの料率は2.00%**（SS10のツールバー表示で確認）。楽天4%の方が有利。
 
 ---
 
