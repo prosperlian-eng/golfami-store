@@ -115,7 +115,7 @@ print("built", len(items), "articles")
 import re as _re
 top = open("index.html", encoding="utf-8").read()
 cards = []
-for d, slug, m in items[:3]:
+for d, slug, m in [x for x in items if x[2].get("video")][:3]:
     thumb = f'<img src="https://i.ytimg.com/vi/{html.escape(m["video"])}/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">' if m.get("video") else '<img src="assets/logo-circle.jpg" alt="" width="480" height="360" loading="lazy">'
     cards.append(f'      <a class="latest-card reveal" href="guide/{slug}.html"><span class="latest-thumb">{thumb}</span><span class="latest-title">{html.escape(m["title"])}</span><span class="latest-date">{html.escape(REL.get(m.get("relation","none"),""))}</span></a>')
 top = _re.sub(r"<!-- GUIDE-START -->.*?<!-- GUIDE-END -->", "<!-- GUIDE-START -->\n" + "\n".join(cards) + "\n<!-- GUIDE-END -->", top, flags=_re.S)
