@@ -7,7 +7,7 @@ import glob, html, os, re
 REL = {"provided": "メーカー提供", "own": "自分で購入", "tieup": "タイアップ", "none": "調べて紹介（使ってはいません）"}
 CSS = """
 :root{--cream:#FBF7F0;--ink:#33291F;--sub:#7A6E5F;--brown:#3E2B20;--terra:#C0603A;--terra-deep:#A84E2B;--sun:#E9B44C;--line:#EADFD0;--rakuten:#BF0000;--amazon:#232F3E}
-*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:500 16px/1.95 "Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;letter-spacing:.02em}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:400 16px/1.9 "Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;letter-spacing:.02em;-webkit-text-size-adjust:100%}
 .pr{background:var(--sun);color:#3a2a10;font-size:13px;line-height:1.5;padding:8px 16px;text-align:center}.pr span{display:block}
 .wrap{max-width:720px;margin:0 auto;padding:0 16px 56px}
 header.top{padding:18px 0 8px}header.top a{color:var(--brown);font-weight:700;text-decoration:none}
@@ -35,12 +35,12 @@ FOOT = ('<footer><p><b>広告・PRについて</b><br>本ページはアフィ�
         '掲載の価格は紹介時点のおおよその目安です。最新の価格・在庫は各ショップの商品ページでご確認ください。<br>'
         '運営: GOLFAMI 親子ゴルフチャンネル</p></footer>')
 
-def head(title, desc, path):
+def head(title, desc, path, ld=""):
     return (f'<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             f'<title>{html.escape(title)}｜GOLFAMI</title><meta name="description" content="{html.escape(desc)}">'
-            f'<link rel="canonical" href="https://golfami.jp/{path}"><link rel="icon" href="../assets/logo-circle.jpg">'
+            f'<link rel="canonical" href="https://golfami.jp/{path}"><meta property="og:title" content="{html.escape(title)}"><meta property="og:description" content="{html.escape(desc)}"><meta property="og:type" content="article"><meta property="og:url" content="https://golfami.jp/{path}"><meta property="og:image" content="https://golfami.jp/assets/ogp.jpg"><meta name="twitter:card" content="summary_large_image">{ld}<link rel="icon" href="../assets/logo-circle.jpg">'
             f'<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-            f'<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">'
+            f'<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">'
             f'<style>{CSS}</style></head><body>{PR}<div class="wrap"><header class="top"><a href="../">GOLFAMI オンラインストア</a> ／ <a href="./">紹介記事</a></header>')
 
 def parse(path):
@@ -73,7 +73,18 @@ for p in sorted(glob.glob("articles/*.md")):
     slug = os.path.basename(p)[:-3]
     m, md = parse(p)
     rel = REL.get(m.get("relation", "none"), REL["none"])
-    page = head(m["title"], m.get("summary", ""), f"guide/{slug}.html")
+    import json as _j
+    ld = {"@context":"https://schema.org","@graph":[
+      {"@type":"Article","headline":m["title"],"description":m.get("summary",""),"datePublished":m["date"],"dateModified":m["date"],
+       "author":{"@type":"Organization","name":"GOLFAMI 親子ゴルフチャンネル","url":"https://www.youtube.com/@family_golf"},
+       "publisher":{"@type":"Organization","name":"GOLFAMI","logo":{"@type":"ImageObject","url":"https://golfami.jp/assets/logo-circle.jpg"}},
+       "image": f"https://i.ytimg.com/vi/{m['video']}/hqdefault.jpg" if m.get("video") else "https://golfami.jp/assets/ogp.jpg",
+       "mainEntityOfPage": f"https://golfami.jp/guide/{slug}.html"},
+      {"@type":"BreadcrumbList","itemListElement":[
+       {"@type":"ListItem","position":1,"name":"GOLFAMI オンラインストア","item":"https://golfami.jp/"},
+       {"@type":"ListItem","position":2,"name":"紹介記事","item":"https://golfami.jp/guide/"},
+       {"@type":"ListItem","position":3,"name":m["product"],"item":f"https://golfami.jp/guide/{slug}.html"}]}]}
+    page = head(m["title"], m.get("summary", ""), f"guide/{slug}.html", '<script type="application/ld+json">'+_j.dumps(ld,ensure_ascii=False)+'</script>')
     page = page.replace("<body>", '<body class="has-sticky">', 1)
     page += f'<h1>{html.escape(m["title"])}</h1><p class="meta"><span class="chip">{html.escape(rel)}</span>{html.escape(m["date"])}</p>'
     if m.get("verdict"):
@@ -120,3 +131,10 @@ for d, slug, m in [x for x in items if x[2].get("video")][:3]:
     cards.append(f'      <a class="latest-card reveal" href="guide/{slug}.html"><span class="latest-thumb">{thumb}</span><span class="latest-title">{html.escape(m["title"])}</span><span class="latest-date">{html.escape(REL.get(m.get("relation","none"),""))}</span></a>')
 top = _re.sub(r"<!-- GUIDE-START -->.*?<!-- GUIDE-END -->", "<!-- GUIDE-START -->\n" + "\n".join(cards) + "\n<!-- GUIDE-END -->", top, flags=_re.S)
 open("index.html", "w", encoding="utf-8").write(top)
+
+# sitemap.xml と robots.txt
+urls = ["https://golfami.jp/", "https://golfami.jp/guide/"] + [f"https://golfami.jp/guide/{s}.html" for _, s, _ in items]
+lm = {f"https://golfami.jp/guide/{s}.html": d for d, s, _ in items}
+xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"<url><loc>{u}</loc>" + (f"<lastmod>{lm[u]}</lastmod>" if u in lm else "") + "</url>\n" for u in urls) + "</urlset>\n"
+open("sitemap.xml", "w").write(xml)
+open("robots.txt", "w").write("User-agent: *\nAllow: /\nSitemap: https://golfami.jp/sitemap.xml\n")
