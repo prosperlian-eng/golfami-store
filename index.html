@@ -683,12 +683,12 @@
 
     <!-- 1位: 王座レイアウト -->
     <article class="card card-1 reveal stagger">
-      <!-- 動画「革命的な素振り棒」(dfZsW1cBXao) = 50万回再生。チャンネル最大のヒット回 -->
+      <!-- 動画「革命的な素振り棒」(dfZsW1cBXao) = 77万回超（2026-11-05時点）。チャンネル最大のヒット回 -->
       <div class="media st st1">
         <a class="thumb-link" href="https://www.youtube.com/watch?v=dfZsW1cBXao">
           <span class="thumb-frame">
             <img src="assets/t-dfZsW1cBXao.jpg" alt="" width="720" height="405" fetchpriority="high">
-            <span class="ribbon">50万回再生</span>
+            <span class="ribbon">77万回再生</span>
             <span class="play" aria-hidden="true">▶</span>
           </span>
         </a>
@@ -888,28 +888,18 @@
   <svg class="divider" viewBox="0 0 750 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 Q 187 6 410 26 T 750 18 V 0 H 0 Z" fill="#FFFFFF"/></svg>
   <div class="wrap">
     <div class="sec-head reveal">
-      <p class="sec-eyebrow" aria-hidden="true">New Videos</p>
-      <h2>新着動画</h2>
-      <p class="h2-sub">チャンネルの最新回。毎日自動で更新されます</p>
+      <p class="sec-eyebrow" aria-hidden="true">Guide</p>
+      <h2>紹介記事</h2>
+      <p class="h2-sub">提供か自腹か、使ったかどうかを最初に書いています</p>
     </div>
     <div class="latest-grid" id="latest-grid">
-      <a class="latest-card reveal" href="https://www.youtube.com/watch?v=WX4auLEOEYI">
-        <span class="latest-thumb"><img src="https://i.ytimg.com/vi/WX4auLEOEYI/hqdefault.jpg" alt="" width="480" height="360" loading="lazy"><span class="mini-play" aria-hidden="true">▶</span></span>
-        <span class="latest-title">熊本地震チャリティーコンペ！</span>
-        <span class="latest-date">2026-08-20</span>
-      </a>
-      <a class="latest-card reveal" href="https://www.youtube.com/watch?v=LR1r0eOtq3Y">
-        <span class="latest-thumb"><img src="https://i.ytimg.com/vi/LR1r0eOtq3Y/hqdefault.jpg" alt="" width="480" height="360" loading="lazy"><span class="mini-play" aria-hidden="true">▶</span></span>
-        <span class="latest-title">初心者ゴルファーあるある</span>
-        <span class="latest-date">2026-08-20</span>
-      </a>
-      <a class="latest-card reveal" href="https://www.youtube.com/watch?v=5ZbyqNS23Qs">
-        <span class="latest-thumb"><img src="https://i.ytimg.com/vi/5ZbyqNS23Qs/hqdefault.jpg" alt="" width="480" height="360" loading="lazy"><span class="mini-play" aria-hidden="true">▶</span></span>
-        <span class="latest-title">初心者GOLF VLOG</span>
-        <span class="latest-date">2026-08-19</span>
-      </a>
+<!-- GUIDE-START -->
+      <a class="latest-card reveal" href="guide/t12-pro.html"><span class="latest-thumb"><img src="https://i.ytimg.com/vi/3o0OgMpHcX4/hqdefault.jpg" alt="" width="480" height="360" loading="lazy"></span><span class="latest-title">親父の相棒。GPSゴルフウォッチ ボイスキャディ T12 PROを親子で試した結論</span><span class="latest-date">メーカー提供</span></a>
+      <a class="latest-card reveal" href="guide/swing-stick-ss10.html"><span class="latest-thumb"><img src="https://i.ytimg.com/vi/dfZsW1cBXao/hqdefault.jpg" alt="" width="480" height="360" loading="lazy"></span><span class="latest-title">素振り棒は本当に練習になる？ボイスキャディ SS10を正直に紹介</span><span class="latest-date">メーカー提供</span></a>
+      <a class="latest-card reveal" href="guide/sl-mini.html"><span class="latest-thumb"><img src="assets/logo-circle.jpg" alt="" width="480" height="360" loading="lazy"></span><span class="latest-title">ラウンドの距離計測に。ボイスキャディ SLミニ（レーザー距離計）</span><span class="latest-date">メーカー提供</span></a>
+<!-- GUIDE-END -->
     </div>
-    <a class="video-link latest-more" href="https://www.youtube.com/@family_golf/videos">チャンネルで全部見る</a>
+    <a class="video-link latest-more" href="guide/">紹介記事を全部見る</a>
   </div>
 </section>
 
@@ -1011,21 +1001,6 @@
 </script>
 
 
-<script>
-(function(){
-  fetch('assets/latest.json?'+ (new Date().toISOString().slice(0,10)))
-    .then(function(r){return r.json()})
-    .then(function(list){
-      var g=document.getElementById('latest-grid');
-      if(!g||!list||!list.length)return;
-      g.innerHTML=list.slice(0,3).map(function(v){
-        return '<a class="latest-card in reveal" href="https://www.youtube.com/watch?v='+v.id+'">'
-          +'<span class="latest-thumb"><img src="https://i.ytimg.com/vi/'+v.id+'/hqdefault.jpg" alt="" loading="lazy"><span class="mini-play" aria-hidden="true">\u25B6</span></span>'
-          +'<span class="latest-title">'+v.title.replace(/[<>&]/g,'')+'</span>'
-          +'<span class="latest-date">'+v.date+'</span></a>';
-      }).join('');
-    }).catch(function(){});
-})();
-</script>
+
 </body>
 </html>

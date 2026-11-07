@@ -8,6 +8,9 @@ video: dfZsW1cBXao
 relation: provided
 rakuten: https://a.r10.to/hgrf5z
 amazon: https://www.amazon.co.jp/dp/B0H3YY2C1N?tag=golfami-22
+verdict: 家で毎日振る練習をしたい人に。スイングスピードが数字で見えるので、続けやすい素振り棒です。
+good: 振るだけで練習になる|スマホでスイングスピードと飛距離の目安が見える|動画を見て買ってくれた人が多い一番人気
+bad: 飛距離はあくまで目安|ボールを打つ練習の代わりにはならない
 ---
 ## 先に、正直な話
 この商品は、メーカーから提供を受けて動画で紹介したものです。そのうえで、良かった点も気になる点も書きます。

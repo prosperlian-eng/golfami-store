@@ -7,17 +7,23 @@ import glob, html, os, re
 REL = {"provided": "メーカー提供", "own": "自分で購入", "tieup": "タイアップ", "none": "調べて紹介（使ってはいません）"}
 CSS = """
 :root{--cream:#FBF7F0;--ink:#33291F;--sub:#7A6E5F;--brown:#3E2B20;--terra:#C0603A;--terra-deep:#A84E2B;--sun:#E9B44C;--line:#EADFD0;--rakuten:#BF0000;--amazon:#232F3E}
-*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.9 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:500 16px/1.95 "Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;letter-spacing:.02em}
 .pr{background:var(--sun);color:#3a2a10;font-size:13px;line-height:1.5;padding:8px 16px;text-align:center}.pr span{display:block}
 .wrap{max-width:720px;margin:0 auto;padding:0 16px 56px}
 header.top{padding:18px 0 8px}header.top a{color:var(--brown);font-weight:700;text-decoration:none}
-h1{font-size:24px;line-height:1.5;margin:20px 0 8px;color:var(--brown)}h2{font-size:19px;margin:32px 0 8px;color:var(--brown);border-left:5px solid var(--terra);padding-left:10px}
+h1{font-weight:700;font-size:25px;line-height:1.5;margin:20px 0 8px;color:var(--brown)}h2{font-weight:700;font-size:20px;margin:32px 0 8px;color:var(--brown);border-left:5px solid var(--terra);padding-left:10px}
 .meta{color:var(--sub);font-size:13px}.chip{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-size:12px;margin-right:6px}
 .video{position:relative;padding-top:56.25%;margin:20px 0;background:#000;border-radius:12px;overflow:hidden}.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin:24px 0}.card b{display:block;margin-bottom:4px}
 .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.btn{flex:1 1 140px;text-align:center;color:#fff;text-decoration:none;font-weight:700;border-radius:10px;padding:14px 8px}
 .btn.rakuten{background:var(--rakuten)}.btn.amazon{background:var(--amazon)}
 ul{padding-left:1.3em}li{margin:4px 0}
+.verdict{background:#fff;border:2px solid var(--terra);border-radius:16px;padding:16px;margin:18px 0 8px}.verdict .lab{display:inline-block;background:var(--terra-deep);color:#fff;font-size:13px;border-radius:6px;padding:2px 10px;margin-bottom:6px}.verdict p{margin:4px 0 0;font-weight:700;color:var(--brown)}.verdict .pr2{color:var(--sub);font-size:14px;font-weight:500}
+.pc{display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0}.pc div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}.pc b{display:block;margin-bottom:2px}.pc .g b{color:#2E7D4F}.pc .bd b{color:var(--terra-deep)}.pc ul{margin:0}
+@media(min-width:600px){.pc{grid-template-columns:1fr 1fr}}
+.sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:8px 12px calc(8px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:center;z-index:9}.sticky span{flex:1;font-size:13px;line-height:1.4;font-weight:700;color:var(--brown)}.sticky a{flex:0 0 auto;padding:10px 14px;font-size:14px}
+body.has-sticky{padding-bottom:72px}
+.rel h2{margin-top:40px}
 .list a{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0;color:inherit;text-decoration:none}.list b{color:var(--brown)}
 footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;color:var(--sub);font-size:13px;line-height:1.8}
 """
@@ -33,6 +39,8 @@ def head(title, desc, path):
     return (f'<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             f'<title>{html.escape(title)}｜GOLFAMI</title><meta name="description" content="{html.escape(desc)}">'
             f'<link rel="canonical" href="https://golfami.jp/{path}"><link rel="icon" href="../assets/logo-circle.jpg">'
+            f'<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+            f'<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">'
             f'<style>{CSS}</style></head><body>{PR}<div class="wrap"><header class="top"><a href="../">GOLFAMI オンラインストア</a> ／ <a href="./">紹介記事</a></header>')
 
 def parse(path):
@@ -66,7 +74,14 @@ for p in sorted(glob.glob("articles/*.md")):
     m, md = parse(p)
     rel = REL.get(m.get("relation", "none"), REL["none"])
     page = head(m["title"], m.get("summary", ""), f"guide/{slug}.html")
+    page = page.replace("<body>", '<body class="has-sticky">', 1)
     page += f'<h1>{html.escape(m["title"])}</h1><p class="meta"><span class="chip">{html.escape(rel)}</span>{html.escape(m["date"])}</p>'
+    if m.get("verdict"):
+        page += (f'<div class="verdict"><span class="lab">この記事の結論</span><p>{html.escape(m["verdict"])}</p>'
+                 f'<span class="pr2">{html.escape(m["product"])}｜{html.escape(m.get("price",""))}</span>{buttons(m)}</div>')
+    if m.get("good") or m.get("bad"):
+        li = lambda k: "".join(f"<li>{html.escape(x)}</li>" for x in m.get(k, "").split("|") if x)
+        page += f'<div class="pc"><div class="g"><b>良かった点</b><ul>{li("good")}</ul></div><div class="bd"><b>気になる点</b><ul>{li("bad")}</ul></div></div>'
     card = (f'<div class="card"><b>{html.escape(m["product"])}</b>{html.escape(m.get("price",""))}'
              f'<br><small>{html.escape(rel)}の商品です。価格と在庫は変わります。</small>{buttons(m)}</div>')
     bh = body_html(md)
@@ -77,14 +92,31 @@ for p in sorted(glob.glob("articles/*.md")):
     if m.get("video"):
         page += f'<div class="video"><iframe src="https://www.youtube.com/embed/{html.escape(m["video"])}" loading="lazy" allowfullscreen title="紹介動画"></iframe></div>'
     page += card
-    page += FOOT + "</div></body></html>"
-    open(f"guide/{slug}.html", "w", encoding="utf-8").write(page)
-    items.append((m["date"], slug, m))
+    page += "<!--REL-->" + FOOT + "</div>"
+    if m.get("rakuten"):
+        page += f'<div class="sticky"><span>{html.escape(m["product"])}</span><a class="btn rakuten" href="{html.escape(m["rakuten"])}" rel="nofollow sponsored">楽天で見る</a></div>'
+    page += "</body></html>"
+    items.append((m["date"], slug, m, page))
 
-items.sort(reverse=True)
+items.sort(key=lambda x: (x[0], x[1]), reverse=True)
+for d, slug, m, page in items:
+    others = [x for x in items if x[1] != slug][:3]
+    rel_html = '<div class="rel"><h2>ほかの紹介記事</h2><div class="list">' + "".join(f'<a href="{s}.html"><b>{html.escape(mm["title"])}</b></a>' for _, s, mm, _ in others) + "</div></div>"
+    open(f"guide/{slug}.html", "w", encoding="utf-8").write(page.replace("<!--REL-->", rel_html))
+items = [(d, s, m) for d, s, m, _ in items]
 idx = head("紹介記事", "GOLFAMIが動画で紹介してきたゴルフ道具の紹介記事。", "guide/") + "<h1>紹介記事</h1><p class='meta'>買わせるためではなく、本当に役立つかを正直に書いています。</p><div class='list'>"
 for d, slug, m in items:
     idx += f'<a href="{slug}.html"><b>{html.escape(m["title"])}</b><br><span class="meta">{html.escape(d)}｜{html.escape(REL.get(m.get("relation","none"),""))}</span><br>{html.escape(m.get("summary",""))}</a>'
 idx += "</div>" + FOOT + "</div></body></html>"
 open("guide/index.html", "w", encoding="utf-8").write(idx)
 print("built", len(items), "articles")
+
+# トップページの「紹介記事」欄（新しい順に3本）
+import re as _re
+top = open("index.html", encoding="utf-8").read()
+cards = []
+for d, slug, m in items[:3]:
+    thumb = f'<img src="https://i.ytimg.com/vi/{html.escape(m["video"])}/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">' if m.get("video") else '<img src="assets/logo-circle.jpg" alt="" width="480" height="360" loading="lazy">'
+    cards.append(f'      <a class="latest-card reveal" href="guide/{slug}.html"><span class="latest-thumb">{thumb}</span><span class="latest-title">{html.escape(m["title"])}</span><span class="latest-date">{html.escape(REL.get(m.get("relation","none"),""))}</span></a>')
+top = _re.sub(r"<!-- GUIDE-START -->.*?<!-- GUIDE-END -->", "<!-- GUIDE-START -->\n" + "\n".join(cards) + "\n<!-- GUIDE-END -->", top, flags=_re.S)
+open("index.html", "w", encoding="utf-8").write(top)
